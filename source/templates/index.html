@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>研途搭子 - AI考研复习智能体</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">研途搭子</div>
+        <div class="team-tag">Team AAA</div>
+    </nav>
+
+    <div class="container">
+        <!-- 首页：上传资料 -->
+        <section id="section-upload">
+            <h1>把复习资料丢进来，它替你出题</h1>
+            <p class="subtitle">粘贴讲义、笔记、真题文本，AI 自动生成模拟题并帮你批改</p>
+            <div class="upload-box">
+                <input type="text" id="material-title" placeholder="给这份资料起个名字（如：数据结构-树与二叉树）">
+                <textarea id="material-content" rows="8" placeholder="在这里粘贴你的复习资料文本..."></textarea>
+                <button onclick="generateQuestions()" class="btn-primary">AI 生成题目</button>
+            </div>
+            <div class="stats-bar" id="stats-bar"></div>
+        </section>
+
+        <!-- 答题区 -->
+        <section id="section-quiz" style="display:none;">
+            <div class="quiz-header">
+                <span id="quiz-progress"></span>
+                <button onclick="resetAll()" class="btn-secondary">重新开始</button>
+            </div>
+            <div class="question-card">
+                <h3 id="question-text"></h3>
+                <textarea id="answer-input" rows="5" placeholder="在这里写下你的答案..."></textarea>
+                <button onclick="submitAnswer()" class="btn-primary">提交答案</button>
+            </div>
+            <div id="result-box" style="display:none;"></div>
+            <div id="next-box" style="display:none;">
+                <button onclick="nextQuestion()" class="btn-primary" id="next-btn">下一题</button>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>研途搭子 · Team AAA · 软件工程团队项目</p>
+    </footer>
+
+    <script>
+        let questions = [];
+        let currentIdx = 0;
+        let materialId = null;
+
+        async function generateQuestions() {
+            const title = document.getElementById('material-title').value || '未命名资料';
+            const content = document.getElementById('material-content').value || '（使用示例题库）';
+
+            const res = await fetch('/api/material', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({title, content})
+            });
+            const data = await res.json();
+            materialId = data.material_id;
+
+            const res2 = await fetch('/api/generate_questions', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({material_id: materialId, use_mock: true})
+            });
+            const data2 = await res2.json();
+            questions = data2.questions;
+            currentIdx = 0;
+
+            document.getElementById('section-upload').style.display = 'none';
+            document.getElementById('section-quiz').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentIdx];
+            document.getElementById('quiz-progress').textContent = `第 ${currentIdx+1} / ${questions.length} 题`;
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('answer-input').value = '';
+            document.getElementById('result-box').style.display = 'none';
+            document.getElementById('next-box').style.display = 'none';
+            document.getElementById('answer-input').disabled = false;
+            document.querySelector('#section-quiz .btn-primary:not(#next-btn)').disabled = false;
+        }
+
+        async function submitAnswer() {
+            const answer = document.getElementById('answer-input').value;
+            if (!answer.trim()) { alert('先写点答案吧'); return; }
+
+            const res = await fetch('/api/answer', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({question_id: 1 + currentIdx, user_answer: answer})
+            });
+            const data = await res.json();
+
+            const box = document.getElementById('result-box');
+            box.style.display = 'block';
+            box.innerHTML = `
+                <div class="result-score">得分：${data.score} / 100</div>
+                <div class="result-feedback"><strong>点评：</strong>${data.feedback}</div>
+                <div class="result-ref"><strong>参考答案：</strong>${data.reference}</div>
+                <div class="result-analysis"><strong>考点分析：</strong>${data.analysis}</div>
+            `;
+            document.getElementById('answer-input').disabled = true;
+            document.getElementById('next-box').style.display = 'block';
+
+            const nextBtn = document.getElementById('next-btn');
+            if (currentIdx >= questions.length - 1) {
+                nextBtn.textContent = '查看总结';
+            } else {
+                nextBtn.textContent = '下一题';
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIdx >= questions.length - 1) {
+                alert('所有题目已完成！这就是研途搭子的核心闭环：出题→答题→批改→考点分析。');
+                resetAll();
+            } else {
+                currentIdx++;
+                showQuestion();
+            }
+        }
+
+        function resetAll() {
+            document.getElementById('section-quiz').style.display = 'none';
+            document.getElementById('section-upload').style.display = 'block';
+            loadStats();
+        }
+
+        async function loadStats() {
+            const res = await fetch('/api/stats');
+            const data = await res.json();
+            document.getElementById('stats-bar').innerHTML =
+                `已生成 ${data.total_questions} 道题 · 已答 ${data.total_answers} 次 · 平均得分 ${data.avg_score}`;
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>

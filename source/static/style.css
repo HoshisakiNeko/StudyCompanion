@@ -1,0 +1,52 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #fcfaf7;
+    color: #1e232d;
+    line-height: 1.6;
+}
+nav {
+    background: linear-gradient(135deg, #0f3746, #195a6e);
+    color: #fff;
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo { font-size: 22px; font-weight: bold; letter-spacing: 2px; }
+.team-tag { font-size: 13px; color: #e67e22; border: 1px solid #e67e22; padding: 2px 12px; border-radius: 20px; }
+.container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+h1 { font-size: 32px; margin-bottom: 8px; }
+.subtitle { color: #6e737d; margin-bottom: 30px; }
+.upload-box { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.upload-box input, .upload-box textarea {
+    width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px;
+    font-size: 14px; font-family: inherit; resize: vertical;
+}
+.upload-box input:focus, .upload-box textarea:focus { outline: none; border-color: #0f3746; }
+.btn-primary {
+    background: #e67e22; color: #fff; border: none; padding: 12px 32px; border-radius: 8px;
+    font-size: 15px; cursor: pointer; font-weight: 600;
+}
+.btn-primary:hover { background: #d35400; }
+.btn-secondary {
+    background: transparent; color: #6e737d; border: 1px solid #ccc; padding: 8px 20px;
+    border-radius: 6px; cursor: pointer; font-size: 13px;
+}
+.stats-bar { margin-top: 20px; color: #888; font-size: 13px; text-align: center; }
+.quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+#quiz-progress { font-size: 16px; color: #0f3746; font-weight: 600; }
+.question-card { background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.question-card h3 { font-size: 18px; margin-bottom: 16px; line-height: 1.7; }
+.question-card textarea {
+    width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;
+    font-family: inherit; resize: vertical; margin-bottom: 12px;
+}
+.result-box { margin-top: 20px; }
+#result-box { background: #fff; border-radius: 12px; padding: 24px; margin-top: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.result-score { font-size: 28px; color: #e67e22; font-weight: bold; margin-bottom: 12px; }
+.result-feedback, .result-ref, .result-analysis { margin-bottom: 10px; font-size: 14px; }
+.result-ref { color: #0f3746; }
+.result-analysis { color: #6e737d; }
+#next-box { text-align: center; margin-top: 20px; }
+footer { text-align: center; padding: 30px; color: #aaa; font-size: 13px; }
